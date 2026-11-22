@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>משמעת מאהבה</title>
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#1f3a93">
+<link rel="icon" href="icons/icon-192.png">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Assistant:wght@400;600;700&family=Secular+One&display=swap" rel="stylesheet">
+<style>
+/* VOICE: warm, practical, calm – a teacher's own notebook, not a corporate dashboard
+   IDEA: the teacher's lesson diary – each attempt is an entry, each class a page
+   PICTURE: the working tracker itself; per-class "what works" pages
+   COLOUR and TYPE: paper white, school-pen blue, highlighter yellow, correction red; Secular One + Assistant
+   LAYOUT: one calm column up to 720px, bottom tab bar, sheet for new entries */
+:root{color-scheme:light dark;
+--bg:light-dark(#fbfaf6,#0f1630);--card:light-dark(#fff,#18224a);--ink:light-dark(#16213e,#eef1fb);
+--mute:light-dark(#5b6480,#a9b2d4);--line:light-dark(#e6e2d6,#2a3768);--blue:light-dark(#1f3a93,#9db2ff);
+--blueBg:light-dark(#e9eefc,#22306a);--hi:light-dark(#ffe066,#e3c64e);--red:light-dark(#c9431f,#ff8a6a);
+--ok:light-dark(#1f7a4d,#62d6a0);--okBg:light-dark(#e3f4ea,#163b31);--mid:light-dark(#a8661a,#f2b862);--midBg:light-dark(#fbefdc,#3d2e17);--noBg:light-dark(#fbe6df,#43231d)}
+:root[data-theme=light]{color-scheme:light}:root[data-theme=dark]{color-scheme:dark}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:17px/1.55 Assistant,system-ui,sans-serif;overflow-x:clip;padding-bottom:calc(84px + env(safe-area-inset-bottom))}
+h1,h2,h3{font-family:"Secular One",Assistant,sans-serif;font-weight:400;line-height:1.1;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,7vw,42px)}h2{font-size:24px;margin:0 0 12px}h3{font-size:19px}
+.wrap{max-width:720px;margin:0 auto;padding:0 16px}
+header{background:var(--blue);color:light-dark(#fff,#0f1630);padding:26px 0 22px}
+header p{margin:6px 0 0;opacity:.9;font-size:16px}
+.sync{font-size:13px;margin-top:10px;display:inline-block;background:light-dark(rgba(255,255,255,.16),rgba(15,22,48,.18));padding:3px 10px;border-radius:99px}
+main{padding:20px 0}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:14px}
+.muted{color:var(--mute);font-size:15px}
+.stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-family:"Secular One";font-size:32px;font-weight:400;color:var(--blue);line-height:1.1}
+.stat span{font-size:14px;color:var(--mute)}
+.next{background:var(--hi);color:#16213e;border:0}
+.next .muted{color:#3d4560}
+button,.btn{font:inherit;font-size:16px;min-height:44px;padding:8px 16px;border-radius:12px;border:1px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+button:focus-visible,input:focus-visible,select:focus-visible,textarea:focus-visible,summary:focus-visible{outline:3px solid var(--hi);outline-offset:2px}
+.pri{background:var(--blue);color:light-dark(#fff,#0f1630);border-color:var(--blue);font-weight:700}
+.ghost{background:transparent}
+.sm{min-height:36px;padding:4px 12px;font-size:15px}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.between{justify-content:space-between}
+.chips{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:14px}
+.chip{flex:none;border-radius:99px;min-height:38px;padding:4px 14px;font-size:15px}
+.chip.on{background:var(--blue);color:light-dark(#fff,#0f1630);border-color:var(--blue)}
+.tag{display:inline-block;font-size:13px;padding:1px 9px;border-radius:99px;background:var(--blueBg);color:var(--blue);white-space:nowrap}
+.res-yes{background:var(--okBg);color:var(--ok)}.res-part{background:var(--midBg);color:var(--mid)}.res-no{background:var(--noBg);color:var(--red)}
+details.mod{background:var(--card);border:1px solid var(--line);border-radius:16px;margin-bottom:10px}
+details.mod>summary{list-style:none;display:flex;gap:12px;align-items:center;padding:14px 16px;cursor:pointer;min-height:56px}
+details.mod>summary::-webkit-details-marker{display:none}
+.num{flex:none;width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:"Secular One";background:var(--blueBg);color:var(--blue)}
+.num.done{background:var(--ok);color:#fff}
+.modbody{padding:0 16px 16px}
+.idea{background:var(--bg);border-inline-start:4px solid var(--hi);padding:10px 12px;border-radius:8px;margin:0 0 12px}
+.tool{border-top:1px solid var(--line);padding:12px 0;display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 12px;align-items:start}
+.tool p{margin:2px 0 0;color:var(--mute);font-size:15px}
+.dots{letter-spacing:2px;color:var(--mid);white-space:nowrap}
+.entry{display:grid;gap:4px}
+.entry .top{display:flex;justify-content:space-between;gap:8px;align-items:baseline}
+.date{font-size:14px;color:var(--mute);white-space:nowrap}
+.group h3{margin:4px 0 8px}
+.group ul{list-style:none;margin:0;padding:0}
+.group li{padding:8px 0;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:10px;align-items:center}
+label{display:block;font-weight:600;font-size:15px;margin:12px 0 6px}
+input,select,textarea{font:inherit;font-size:16px;width:100%;min-height:44px;padding:8px 12px;border-radius:12px;border:1px solid var(--line);background:var(--bg);color:var(--ink)}
+textarea{min-height:80px;resize:vertical}
+.seg{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.seg.five{grid-template-columns:repeat(5,minmax(0,1fr))}
+.seg button{padding:6px 4px;font-size:15px}
+.seg button.on{background:var(--blue);color:light-dark(#fff,#0f1630);border-color:var(--blue);font-weight:700}
+nav{position:fixed;inset-inline:0;bottom:0;background:var(--card);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom);z-index:5}
+nav .wrap{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));padding:0}
+nav a{display:grid;justify-items:center;gap:2px;padding:9px 4px;color:var(--mute);text-decoration:none;font-size:13px;min-height:60px}
+nav a.on{color:var(--blue);font-weight:700}
+nav svg{width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+#sheet{position:fixed;inset:0;background:rgba(10,14,30,.5);display:none;align-items:flex-end;justify-content:center;z-index:10}
+#sheet.open{display:flex}
+#sheet .panel{background:var(--card);width:100%;max-width:720px;max-height:92vh;overflow-y:auto;border-radius:20px 20px 0 0;padding:20px 16px calc(20px + env(safe-area-inset-bottom))}
+#toast{position:fixed;bottom:96px;inset-inline:16px;margin:auto;max-width:420px;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;text-align:center;opacity:0;pointer-events:none;transition:opacity .2s;z-index:20}
+#toast.show{opacity:1}
+@media(prefers-reduced-motion:reduce){#toast{transition:none}}
+.empty{text-align:center;padding:24px 16px}
+.addform{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr) auto;gap:8px;align-items:end}
+@media(max-width:600px){.addform{grid-template-columns:minmax(0,1fr)}}
+</style>
+</head>
+<body>
+<header><div class="wrap">
+  <h1>משמעת מאהבה</h1>
+  <p>יומן הניסיונות שלי: מה עובד, ובאיזו כיתה</p>
+  <span class="sync">נשמר במכשיר הזה</span>
+</div></header>
+<main class="wrap" id="view"></main>
+<nav><div class="wrap" id="nav">
+  <a href="#home" data-v="home"><svg viewBox="0 0 24 24"><path d="M3 11l9-7 9 7v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1z"/></svg>בית</a>
+  <a href="#course" data-v="course"><svg viewBox="0 0 24 24"><path d="M4 5a2 2 0 0 1 2-2h13v16H6a2 2 0 0 0-2 2z"/><path d="M4 21V5"/><path d="M9 7h6"/></svg>הקורס</a>
+  <a href="#log" data-v="log"><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/><rect x="3" y="3" width="18" height="18" rx="4"/></svg>ניסיונות</a>
+  <a href="#insights" data-v="insights"><svg viewBox="0 0 24 24"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg>מה עובד</a>
+</div></nav>
+<div id="sheet"><div class="panel" id="panel"></div></div>
+<div id="toast" role="status"></div>
+
+<script>
+{
+const TAGS={late:'איחורים',hw:'שיעורי בית',out:'יציאה מהשיעור',rel:'קשר ואווירה',gen:'כללי'};
+const MODS=[
+{id:'m1',t:'היסודות',idea:'משמעת מבחוץ נשענת על פחד, ונעלמת כשהמורה לא מסתכל. משמעת מבפנים נשענת על מחויבות וקשר. כל תגובה שלנו מלמדת את התלמיד בשביל מי הוא עושה.',tools:[
+['t11','המורה שזכרתי','כתוב על מורה שזכרת לטובה: מה הוא עשה שגרם לך לרצות?','gen'],
+['t12','ספירת תגובות','בשיעור אחד, סמן על דף כמה הערות וכמה חיזוקים נתת.','gen']]},
+{id:'m2',t:'להכיר את גיל ההתבגרות',idea:'מתבגרים צריכים עצמאות, שייכות והכרה, והם רגישים מאוד לביוש מול חברים. בכיתה י"א מניע בעיקר החיבור למטרה: הבגרות והעתיד.',tools:[
+['t21','הערה ביחידות','במקום הערה מול הכיתה: מילה שקטה ליד השולחן או אחרי השיעור.','rel'],
+['t22','"למה" לפני משימה','משפט אחד לפני כל משימה: בשביל מה זה טוב להם.','hw'],
+['t23','חיבור ליעד (י"א)','להראות איך המשימה מופיעה בבגרות ומה היא שווה בציון.','hw']]},
+{id:'m3',t:'קשר כבסיס',idea:'תלמיד משתף פעולה עם מורה שהוא מרגיש שרואה אותו. הקשר נבנה ברגעים קטנים וקבועים, לא בנאומים.',tools:[
+['t31','קבלה בשם בדלת','לעמוד בדלת ולפנות לכל נכנס בשמו.','late'],
+['t32','שיחת 2 דקות','שיחה קצרה על משהו אישי, עם תלמיד אחד בכל יום.','rel'],
+['t33','חמש מול אחת','על כל הערה, חמש מילים חיוביות ואמיתיות לאותו תלמיד.','rel'],
+['t34','פרט אישי לכל תלמיד','לרשום לכל תלמיד פרט אחד שמעניין אותו, ולהשתמש בו.','rel']]},
+{id:'m4',t:'כניסה בזמן',idea:'כשהשיעור מתחיל רק אחרי שכולם התיישבו, האיחור לא עולה כלום. כשלדקות הראשונות יש ערך, מי שמאחר מפסיד, בלי שאמרת מילה.',tools:[
+['t41','משימת דלת','2–3 תרגילים על הלוח לפני הכניסה. פותרים לבד, ובודקים יחד בדקה החמישית.','late'],
+['t42','שגרת פתיחה קבועה','אותו סדר פתיחה בכל שיעור, כך שהתלמידים יודעים מה מחכה להם.','late'],
+['t43','חיזוק למגיעים בזמן','הכרה במי שהגיע בזמן, ולא רק תגובה למאחרים.','late'],
+['t44','שיחה עם מאחר קבוע','שיחה בארבע עיניים: לברר מה הסיבה ולחפש פתרון יחד.','late'],
+['t45','תלמיד אחראי פתיחה','תלמיד בתורנות מציג את הפתרון של משימת הדלת.','late'],
+['t46','הזמנה אישית פנימה','לתלמיד שנשאר בחוץ: פנייה אישית ותפקיד קטן בשיעור.','out']]},
+{id:'m5',t:'שיעורי בית כמחויבות',idea:'"אין לי זמן" פירושו לרוב "זה לא שווה לי". שיעורי הבית צריכים להרגיש כמו רווח, לא כמו מחיר.',tools:[
+['t51','פחות ואיכותי','2–3 תרגילים ממוקדים במקום דף שלם.','hw'],
+['t52','בחירה בין משימות','שתי רמות או שני סוגי משימה, והתלמיד בוחר.','hw'],
+['t53','התחלה בכיתה','ב-5 הדקות האחרונות מתחילים את שיעורי הבית יחד.','hw'],
+['t54','משוב במקום סימון','הערה אחת קצרה ומועילה על העבודה.','hw'],
+['t55','יעד אישי ומעקב','התלמיד מציב לעצמו יעד שבועי ומסמן בעצמו את ההתקדמות.','hw'],
+['t56','שאלה במקום עונש','"מה הפריע לך להכין?" ואז פתרון משותף.','hw']]},
+{id:'m6',t:'כללים והסכמות',idea:'כללים שהתלמידים שותפים להם נשמרים יותר. מעט כללים, ברורים, עם תוצאות הגיוניות.',tools:[
+['t61','אמנה כיתתית','בונים יחד 3–5 כללים וכותבים אותם.','gen'],
+['t62','תוצאה טבעית','תוצאה שקשורה למעשה עצמו: מי שאיחר משלים את משימת הדלת.','late'],
+['t63','עקביות שקטה','אותה תגובה בכל פעם, בקול רגוע.','gen']]},
+{id:'m7',t:'התנגדות וקונפליקטים',idea:'במאבק כוח מול הכיתה המורה תמיד מפסיד. רוגע, שיחה בפרטיות ושאלה פתוחה מורידים את הלהבות.',tools:[
+['t71','דחייה לשיחה','"נדבר על זה אחרי השיעור", וממשיכים הלאה.','rel'],
+['t72','"אני רואה ש… מה קרה?"','לתאר בלי להאשים, ואז לשאול.','rel'],
+['t73','נשימה לפני תגובה','עצירה של שלוש שניות לפני שעונים.','gen']]},
+{id:'m8',t:'המורה כדוגמה',idea:'התלמידים לומדים ממה שאנחנו עושים יותר ממה שאנחנו אומרים.',tools:[
+['t81','להגיע לפני הצלצול','להיות בכיתה לפני התלמידים.','late'],
+['t82','להודות בטעות','לומר בפשטות "טעיתי" מול הכיתה.','rel'],
+['t83','לעמוד בהבטחה','להבטיח דבר קטן ולקיים אותו.','rel']]},
+{id:'m9',t:'יישום ומעקב',idea:'ניסוי קטן, מדידה פשוטה ורפלקציה. כך מגלים מה מתאים לכל כיתה.',tools:[
+['t91','ניסוי בכיתה אחת','לנסות כלי אחד בכיתה אחת במשך שבוע.','gen'],
+['t92','מדד הגעה בזמן','לרשום בתחילת כל שיעור כמה תלמידים נכנסו בזמן.','late'],
+['t93','יומן שבועי','שלוש שורות בסוף השבוע: מה עבד ומה לא.','gen']]}
+];
+const BUILT=MODS.flatMap(m=>m.tools.map(([id,title,how,tag])=>({id,title,how,tag,mod:m.id,built:true})));
+const RES={yes:'הצליח',part:'הצליח חלקית',no:'לא הצליח'};
+const REP={again:'לחזור על זה',tweak:'לחזור עם שינוי',stop:'לא לחזור'};
+
+const KEY='mishmaat-v1';
+let M={}, S={classes:[],strats:[],atts:[],done:[]};
+try{M=JSON.parse(localStorage.getItem(KEY)||'{}')||{}}catch(e){M={}}
+let view='home', fCls='all', iCls=null, F={};
+const $=s=>document.querySelector(s);
+const esc=s=>String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const nid=p=>p+'_'+Date.now().toString(36)+Math.random().toString(36).slice(2,6);
+const today=()=>new Date().toLocaleDateString('en-CA');
+const fmtD=d=>(d||'').split('-').reverse().join('.');
+const dots=n=>'●'.repeat(n)+'○'.repeat(5-n);
+
+function derive(){
+  const v=Object.entries(M).map(([id,o])=>({...o,id}));
+  S.classes=v.filter(o=>o.kind==='class').sort((a,b)=>(a.ts||0)-(b.ts||0));
+  S.strats=v.filter(o=>o.kind==='strat').sort((a,b)=>(a.ts||0)-(b.ts||0));
+  S.atts=v.filter(o=>o.kind==='att').sort((a,b)=>(b.date||'').localeCompare(a.date||'')||(b.ts||0)-(a.ts||0));
+  S.done=(M.progress&&M.progress.done)||[];
+  if(!S.classes.find(c=>c.id===iCls)) iCls=S.classes[0]?.id||null;
+}
+const tools=()=>BUILT.concat(S.strats.map(s=>({...s,built:false})));
+const tool=id=>tools().find(t=>t.id===id);
+const clsName=id=>S.classes.find(c=>c.id===id)?.name||'כיתה שנמחקה';
+
+function verdict(tid,cid){
+  const l=S.atts.filter(a=>a.tool===tid&&(!cid||a.cls===cid));
+  if(!l.length) return null;
+  const avg=l.reduce((s,a)=>s+(+a.lvl||0),0)/l.length;
+  const last=l[0].rep;
+  const v=last==='stop'?'no':(last==='again'&&avg>=3.5?'yes':'tweak');
+  return {n:l.length,avg,v};
+}
+
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(M));return true}catch(e){toast('השמירה במכשיר נכשלה');return false}}
+function put(id,obj){M[id]=obj;persist();derive();render()}
+function del(id){delete M[id];persist();derive();render()}
+function exportData(){
+  const blob=new Blob([JSON.stringify({app:'mishmaat',v:1,at:new Date().toISOString(),data:M},null,1)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mishmaat-gibui-'+today()+'.json';document.body.appendChild(a);a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);
+  try{localStorage.setItem(KEY+'-last',today())}catch(e){}
+  render();
+}
+function importData(file){
+  const r=new FileReader();
+  r.onload=()=>{try{const j=JSON.parse(r.result);const d=j&&j.data;if(!d||typeof d!=='object')throw 0;
+    Object.assign(M,d);persist();derive();render();toast('הגיבוי שוחזר')}catch(e){toast('הקובץ לא תקין')}};
+  r.readAsText(file);
+}
+
+/* ---------- views ---------- */
+function vHome(){
+  const works=S.classes.reduce((n,c)=>n+tools().filter(t=>verdict(t.id,c.id)?.v==='yes').length,0);
+  const nextM=MODS.find(m=>!S.done.includes(m.id));
+  let h=`<div class="stats"><div class="stat"><b>${S.atts.length}</b><span>ניסיונות</span></div><div class="stat"><b>${works}</b><span>דרכים שעובדות</span></div><div class="stat"><b>${S.done.length}/9</b><span>מודולים</span></div></div>`;
+  h+= nextM?`<div class="card next"><div class="muted">הצעד הבא בקורס</div><h3 style="margin:4px 0 10px">מודול ${MODS.indexOf(nextM)+1}: ${nextM.t}</h3><a class="btn pri" style="display:inline-flex;align-items:center;text-decoration:none" href="#course" data-open="${nextM.id}">להמשיך ללמוד</a></div>`
+        :`<div class="card next"><h3>סיימת את כל המודולים</h3><p class="muted" style="margin:6px 0 0">עכשיו העבודה היא בכיתה: להמשיך לנסות ולתעד.</p></div>`;
+  h+=`<h2 style="margin-top:22px">הכיתות שלי</h2>`;
+  if(!S.classes.length) h+=`<div class="card empty"><p style="margin:0 0 12px">התחל בהוספת הכיתות שאתה מלמד. לכל כיתה יתנהל עמוד נפרד של מה שעובד.</p><div class="row" style="justify-content:center">${['ז\'','ח\'','ט\'','י"א'].map(n=>`<button class="sm" data-act="quick" data-n="${esc(n)}">כיתה ${esc(n)}</button>`).join('')}</div></div>`;
+  h+=S.classes.map(c=>{
+    const best=tools().map(t=>({t,v:verdict(t.id,c.id)})).filter(x=>x.v&&x.v.v==='yes').sort((a,b)=>b.v.avg-a.v.avg).slice(0,2);
+    const n=S.atts.filter(a=>a.cls===c.id).length;
+    return `<div class="card"><div class="row between"><h3>${esc(c.name)}</h3><span class="tag">${TAGS[c.issue]||'כללי'}</span></div>
+    <p class="muted" style="margin:6px 0 10px">${n?`${n} ניסיונות. ${best.length?'עובד: '+best.map(x=>esc(x.t.title)).join(', '):'עוד לא נמצאה דרך שעובדת בוודאות.'}`:'עוד אין ניסיונות בכיתה הזו.'}</p>
+    <div class="row"><button class="pri sm" data-act="new" data-cls="${c.id}">תיעוד ניסיון</button><button class="sm ghost" data-act="seeCls" data-cls="${c.id}">מה עובד כאן</button><button class="sm ghost" data-act="del" data-id="${c.id}">מחיקה</button></div></div>`}).join('');
+  h+=`<div class="card"><h3>הוספת כיתה</h3><div class="addform"><div><label for="c-name">שם הכיתה</label><input id="c-name" placeholder="למשל: ח' הקבצה א'"></div>
+  <div><label for="c-issue">האתגר העיקרי</label><select id="c-issue">${Object.entries(TAGS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select></div>
+  <button class="pri" data-act="addcls">הוספה</button></div></div>`;
+  let last='';try{last=localStorage.getItem(KEY+'-last')||''}catch(e){}
+  h+=`<div class="card"><h3>גיבוי</h3><p class="muted" style="margin:6px 0 10px">הנתונים שמורים רק במכשיר הזה. כדאי לגבות לקובץ מדי פעם, ולשחזר ממנו במכשיר אחר.${last?' גיבוי אחרון: '+fmtD(last)+'.':''}</p>
+  <div class="row"><button class="pri sm" data-act="export">שמירת גיבוי לקובץ</button><label class="btn sm" style="display:inline-flex;align-items:center;margin:0;font-weight:400">שחזור מקובץ<input type="file" id="imp" accept="application/json,.json" hidden></label></div></div>`;
+  return h;
+}
+function vCourse(){
+  return `<h2>תשעת המודולים</h2><p class="muted" style="margin:-6px 0 14px">בכל מודול יש רעיון אחד וכמה כלים לנסות בכיתה. אחרי כל ניסיון לחץ "ניסיתי" ותעד מה קרה.</p>`+
+  MODS.map((m,i)=>{
+    const done=S.done.includes(m.id);
+    const list=m.tools.map(([id])=>tool(id)).concat(S.strats.filter(s=>s.mod===m.id));
+    return `<details class="mod" id="d-${m.id}"><summary><span class="num ${done?'done':''}">${done?'✓':i+1}</span><h3 style="flex:1">${m.t}</h3><span class="muted">${list.length} כלים</span></summary>
+    <div class="modbody"><p class="idea">${m.idea}</p>
+    ${list.map(t=>{const v=verdict(t.id);return `<div class="tool"><div><b>${esc(t.title)}</b> <span class="tag">${TAGS[t.tag]||'כללי'}</span>${t.built?'':' <span class="tag res-part">שלי</span>'}<p>${esc(t.how)}</p>${v?`<p>נוסה ${v.n} פעמים · <span class="dots">${dots(Math.round(v.avg))}</span></p>`:''}</div>
+      <div class="row" style="flex-direction:column;align-items:stretch"><button class="sm pri" data-act="new" data-tool="${t.id}">ניסיתי</button>${t.built?'':`<button class="sm ghost" data-act="del" data-id="${t.id}">מחיקה</button>`}</div></div>`}).join('')}
+    <div class="tool" style="grid-template-columns:minmax(0,1fr)"><b>להוסיף דרך משלך</b>
+      <input id="nt-${m.id}" placeholder="שם הדרך"><input id="nh-${m.id}" placeholder="איך עושים את זה, במשפט אחד">
+      <select id="ng-${m.id}">${Object.entries(TAGS).map(([k,v])=>`<option value="${k}">${v}</option>`).join('')}</select>
+      <div class="row between"><button class="sm" data-act="addtool" data-mod="${m.id}">הוספת הדרך</button><button class="sm ${done?'':'pri'}" data-act="done" data-mod="${m.id}">${done?'סימון כלא הושלם':'סיימתי את המודול'}</button></div></div>
+    </div></details>`}).join('');
+}
+function vLog(){
+  const list=S.atts.filter(a=>fCls==='all'||a.cls===fCls);
+  return `<div class="row between" style="margin-bottom:12px"><h2 style="margin:0">ניסיונות</h2><button class="pri" data-act="new">ניסיון חדש</button></div>
+  ${S.classes.length?`<div class="chips"><button class="chip ${fCls==='all'?'on':''}" data-act="fcls" data-cls="all">הכל</button>${S.classes.map(c=>`<button class="chip ${fCls===c.id?'on':''}" data-act="fcls" data-cls="${c.id}">${esc(c.name)}</button>`).join('')}</div>`:''}
+  ${list.length?list.map(a=>`<div class="card entry"><div class="top"><b>${esc(tool(a.tool)?.title||'דרך שנמחקה')}</b><span class="date">${fmtD(a.date)}</span></div>
+  <div class="row"><span class="tag">${esc(clsName(a.cls))}</span><span class="tag res-${a.res}">${RES[a.res]||''}</span><span class="dots" aria-label="רמת הצלחה ${a.lvl} מתוך 5">${dots(+a.lvl||0)}</span><span class="muted">${REP[a.rep]||''}</span></div>
+  ${a.note?`<p style="margin:4px 0 0">${esc(a.note)}</p>`:''}<div><button class="sm ghost" data-act="del" data-id="${a.id}">מחיקה</button></div></div>`).join('')
+  :`<div class="card empty"><p style="margin:0">עוד אין ניסיונות${fCls==='all'?'':' בכיתה הזו'}. נסה כלי אחד בשיעור הבא, ותעד כאן מה קרה.</p></div>`}`;
+}
+function vInsights(){
+  if(!S.classes.length) return `<h2>מה עובד</h2><div class="card empty"><p style="margin:0 0 12px">כדי לראות מה עובד בכל כיתה, הוסף קודם את הכיתות שלך.</p><a class="btn pri" style="display:inline-flex;align-items:center;text-decoration:none" href="#home">להוספת כיתות</a></div>`;
+  const c=S.classes.find(x=>x.id===iCls)||S.classes[0];
+  const rows=tools().map(t=>({t,v:verdict(t.id,c.id)}));
+  const g=k=>rows.filter(x=>x.v&&x.v.v===k).sort((a,b)=>b.v.avg-a.v.avg);
+  const untried=rows.filter(x=>!x.v&&(x.t.tag===c.issue)).slice(0,5);
+  const li=x=>`<li><span>${esc(x.t.title)}</span><span class="row" style="flex-wrap:nowrap"><span class="dots">${dots(Math.round(x.v.avg))}</span><span class="muted">×${x.v.n}</span></span></li>`;
+  const grp=(title,cls,arr,emptyT)=>`<div class="card group"><h3><span class="tag ${cls}">${title}</span></h3>${arr.length?`<ul>${arr.map(li).join('')}</ul>`:`<p class="muted" style="margin:0">${emptyT}</p>`}</div>`;
+  return `<h2>מה עובד</h2><div class="chips">${S.classes.map(x=>`<button class="chip ${x.id===c.id?'on':''}" data-act="icls" data-cls="${x.id}">${esc(x.name)}</button>`).join('')}</div>
+  ${grp('עובד, להמשיך','res-yes',g('yes'),'עוד לא נמצאה דרך שהצליחה כאן וסומנה כ"לחזור על זה".')}
+  ${grp('לנסות שוב עם שינוי','res-part',g('tweak'),'אין כרגע.')}
+  ${grp('לא מתאים לכיתה הזו','res-no',g('no'),'אין כרגע.')}
+  <div class="card group"><h3>עוד לא ניסית (${TAGS[c.issue]||'כללי'})</h3>${untried.length?`<ul>${untried.map(x=>`<li><span>${esc(x.t.title)}<br><span class="muted">${esc(x.t.how)}</span></span><button class="sm" data-act="new" data-tool="${x.t.id}" data-cls="${c.id}">ניסיתי</button></li>`).join('')}</ul>`:'<p class="muted" style="margin:0">ניסית את כל הכלים שמתאימים לאתגר הזה.</p>'}</div>`;
+}
+
+/* ---------- sheet ---------- */
+function openSheet(pre){
+  F={cls:pre.cls||(fCls!=='all'?fCls:S.classes[0]?.id)||'',tool:pre.tool||'',res:'',lvl:0,rep:'',date:today(),note:''};
+  drawSheet();$('#sheet').classList.add('open');
+}
+function drawSheet(){
+  const opts=MODS.map(m=>`<optgroup label="${m.t}">${m.tools.map(([id])=>tool(id)).concat(S.strats.filter(s=>s.mod===m.id)).map(t=>`<option value="${t.id}" ${F.tool===t.id?'selected':''}>${esc(t.title)}</option>`).join('')}</optgroup>`).join('');
+  $('#panel').innerHTML=`<div class="row between"><h2 style="margin:0">תיעוד ניסיון</h2><button class="sm ghost" data-act="close">סגירה</button></div>
+  ${S.classes.length?'':'<p class="muted">אין עדיין כיתות. הוסף כיתה במסך הבית.</p>'}
+  <label for="f-cls">כיתה</label><select id="f-cls">${S.classes.map(c=>`<option value="${c.id}" ${F.cls===c.id?'selected':''}>${esc(c.name)}</option>`).join('')}</select>
+  <label for="f-tool">מה ניסיתי</label><select id="f-tool"><option value="">בחר דרך…</option>${opts}</select>
+  <label for="f-date">תאריך</label><input id="f-date" type="date" value="${F.date}">
+  <label>האם הצליח?</label><div class="seg">${Object.entries(RES).map(([k,v])=>`<button data-act="res" data-v="${k}" class="${F.res===k?'on':''}">${v}</button>`).join('')}</div>
+  <label>רמת הצלחה</label><div class="seg five">${[1,2,3,4,5].map(n=>`<button data-act="lvl" data-v="${n}" class="${F.lvl===n?'on':''}">${n}</button>`).join('')}</div>
+  <label>בפעם הבאה</label><div class="seg">${Object.entries(REP).map(([k,v])=>`<button data-act="rep" data-v="${k}" class="${F.rep===k?'on':''}">${v}</button>`).join('')}</div>
+  <label for="f-note">מה קרה, ומה הייתי משנה</label><textarea id="f-note" placeholder="למשל: 14 מתוך 20 נכנסו בזמן. בפעם הבאה תרגילים קלים יותר.">${esc(F.note)}</textarea>
+  <button class="pri" style="width:100%;margin-top:16px" data-act="save">שמירה</button>`;
+}
+function keepForm(){F.cls=$('#f-cls')?.value||F.cls;F.tool=$('#f-tool')?.value||'';F.date=$('#f-date')?.value||F.date;F.note=$('#f-note')?.value||''}
+
+/* ---------- render & events ---------- */
+function render(){
+  const openIds=[...document.querySelectorAll('details.mod[open]')].map(d=>d.id);
+  const V={home:vHome,course:vCourse,log:vLog,insights:vInsights}[view]||vHome;
+  $('#view').innerHTML=V();
+  openIds.forEach(id=>{const d=document.getElementById(id);if(d)d.open=true});
+  document.querySelectorAll('#nav a').forEach(a=>a.classList.toggle('on',a.dataset.v===view));
+}
+function route(){view=(location.hash||'#home').slice(1);if(!['home','course','log','insights'].includes(view))view='home';render();
+  const o=sessionStorageSafe('open');if(view==='course'&&o){const d=document.getElementById('d-'+o);if(d){d.open=true;d.scrollIntoView({block:'start'})}sessionStorageSafe('open','')}
+  else window.scrollTo(0,0)}
+function sessionStorageSafe(k,v){try{if(v===undefined)return sessionStorage.getItem(k);sessionStorage.setItem(k,v)}catch(e){return null}}
+window.addEventListener('hashchange',route);
+
+document.addEventListener('click',e=>{
+  const op=e.target.closest('[data-open]');if(op)sessionStorageSafe('open',op.dataset.open);
+  const b=e.target.closest('[data-act]');if(!b)return;
+  const a=b.dataset.act,d=b.dataset;
+  if(a==='quick'){put(nid('c'),{kind:'class',name:'כיתה '+d.n,issue:'gen',ts:Date.now()})}
+  else if(a==='addcls'){const n=$('#c-name').value.trim();if(!n){toast('כתוב שם לכיתה');return}put(nid('c'),{kind:'class',name:n,issue:$('#c-issue').value,ts:Date.now()})}
+  else if(a==='del'){if(b.dataset.armed){del(d.id)}else{b.dataset.armed=1;b.textContent='בטוח? לחץ שוב';setTimeout(()=>{if(b.isConnected){delete b.dataset.armed;b.textContent='מחיקה'}},3000)}}
+  else if(a==='seeCls'){iCls=d.cls;location.hash='#insights'}
+  else if(a==='icls'){iCls=d.cls;render()}
+  else if(a==='fcls'){fCls=d.cls;render()}
+  else if(a==='done'){const s=new Set(S.done);s.has(d.mod)?s.delete(d.mod):s.add(d.mod);put('progress',{kind:'prog',done:[...s]})}
+  else if(a==='addtool'){const t=$('#nt-'+d.mod).value.trim();if(!t){toast('כתוב שם לדרך');return}
+    put(nid('s'),{kind:'strat',title:t,how:$('#nh-'+d.mod).value.trim(),tag:$('#ng-'+d.mod).value,mod:d.mod,ts:Date.now()});toast('הדרך נוספה')}
+  else if(a==='new'){if(!S.classes.length){toast('הוסף קודם כיתה במסך הבית');location.hash='#home';return}openSheet({tool:d.tool,cls:d.cls})}
+  else if(a==='export'){exportData()}
+  else if(a==='close'){$('#sheet').classList.remove('open')}
+  else if(a==='res'||a==='lvl'||a==='rep'){keepForm();F[a]=a==='lvl'?+d.v:d.v;drawSheet()}
+  else if(a==='save'){keepForm();
+    if(!F.cls||!F.tool||!F.res||!F.lvl||!F.rep){toast('מלא כיתה, דרך, הצלחה, רמה ומה בפעם הבאה');return}
+    put(nid('a'),{kind:'att',cls:F.cls,tool:F.tool,date:F.date||today(),res:F.res,lvl:F.lvl,rep:F.rep,note:F.note.trim(),ts:Date.now()});
+    $('#sheet').classList.remove('open');toast('הניסיון נשמר')}
+});
+$('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')$('#sheet').classList.remove('open')});
+
+derive();
+route();
+document.addEventListener('change',e=>{if(e.target.id==='imp'&&e.target.files[0])importData(e.target.files[0])});
+if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
+
+}
+</script>
+</body>
+</html>
