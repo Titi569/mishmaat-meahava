@@ -191,8 +191,30 @@ function verdict(tid,cid){
 
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(M));return true}catch(e){toast('השמירה במכשיר נכשלה');return false}}
-function put(id,obj){M[id]=obj;persist();derive();render()}
-function del(id){delete M[id];persist();derive();render()}
+function put(id,obj){M[id]=obj;persist();derive();render();queueSync()}
+function del(id){delete M[id];persist();derive();render();queueSync()}
+/* ---------- automatic backup to Gmail (via Google Apps Script) ---------- */
+function cfg(){try{return JSON.parse(localStorage.getItem(KEY+'-cfg')||'null')}catch(e){return null}}
+function setCfg(c){try{c?localStorage.setItem(KEY+'-cfg',JSON.stringify(c)):localStorage.removeItem(KEY+'-cfg')}catch(e){}}
+function lsGet(k){try{return localStorage.getItem(k)}catch(e){return null}}
+function lsSet(k,v){try{localStorage.setItem(k,v)}catch(e){}}
+let syncT=null;
+function queueSync(){if(!cfg())return;lsSet(KEY+'-dirty','1');clearTimeout(syncT);syncT=setTimeout(syncNow,3000)}
+async function syncNow(manual){
+  const c=cfg();if(!c)return;
+  if(!Object.keys(M).length){if(manual)toast('אין עדיין נתונים לגבות');return}
+  try{
+    await fetch(c.url,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain;charset=utf-8'},body:JSON.stringify({token:c.token,data:M})});
+    lsSet(KEY+'-dirty','');lsSet(KEY+'-synced',new Date().toISOString());if(manual)toast('הנתונים נשלחו לגיבוי');
+  }catch(e){if(manual)toast('אין חיבור לאינטרנט. ננסה שוב אחר כך')}
+  if(view==='home'&&!$('#sheet').classList.contains('open'))render();
+}
+function readConnect(){
+  const p=new URLSearchParams(location.search).get('connect');if(!p)return;
+  try{const [url,token]=decodeURIComponent(escape(atob(p))).split('|');
+    if(/^https:\/\/script\.google\.com\//.test(url)&&token){setCfg({url,token});lsSet(KEY+'-dirty','1');setTimeout(()=>{toast('הגיבוי האוטומטי חובר');syncNow()},500)}}catch(e){}
+  history.replaceState(null,'',location.pathname+location.hash);
+}
 function exportData(){
   const blob=new Blob([JSON.stringify({app:'mishmaat',v:1,at:new Date().toISOString(),data:M},null,1)],{type:'application/json'});
   const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='mishmaat-gibui-'+today()+'.json';document.body.appendChild(a);a.click();
@@ -227,7 +249,11 @@ function vHome(){
   <button class="pri" data-act="addcls">הוספה</button></div></div>`;
   let last='';try{last=localStorage.getItem(KEY+'-last')||''}catch(e){}
   h+=`<div class="card"><h3>גיבוי</h3><p class="muted" style="margin:6px 0 10px">הנתונים שמורים רק במכשיר הזה. כדאי לגבות לקובץ מדי פעם, ולשחזר ממנו במכשיר אחר.${last?' גיבוי אחרון: '+fmtD(last)+'.':''}</p>
-  <div class="row"><button class="pri sm" data-act="export">שמירת גיבוי לקובץ</button><label class="btn sm" style="display:inline-flex;align-items:center;margin:0;font-weight:400">שחזור מקובץ<input type="file" id="imp" accept="application/json,.json" hidden></label></div></div>`;
+  <div class="row"><button class="pri sm" data-act="export">שמירת גיבוי לקובץ</button><label class="btn sm" style="display:inline-flex;align-items:center;margin:0;font-weight:400">שחזור מקובץ<input type="file" id="imp" accept="application/json,.json" hidden></label></div>
+  <div style="border-top:1px solid var(--line);margin-top:14px;padding-top:12px">${(()=>{const c=cfg();const sy=lsGet(KEY+'-synced');
+    return c?`<b>גיבוי אוטומטי ל-Gmail: פעיל</b><p class="muted" style="margin:4px 0 10px">כל שינוי נשלח לגיבוי. בכל יום ב-17:00 נשלח אליך מייל עם הנתונים, בתווית "גיבוי משמעת מאהבה". נשמרים 4 הגיבויים האחרונים.${sy?' נשלח לאחרונה: '+new Date(sy).toLocaleString('he-IL',{dateStyle:'short',timeStyle:'short'})+'.':''}${lsGet(KEY+'-dirty')?' יש שינויים שעוד לא נשלחו.':''}</p>
+      <div class="row"><button class="sm" data-act="syncnow">שליחה עכשיו</button><button class="sm ghost" data-act="unlink">ניתוק</button></div>`
+     :`<b>גיבוי אוטומטי ל-Gmail: לא מחובר</b><p class="muted" style="margin:4px 0 0">כדי לחבר, פותחים בטלפון את קישור החיבור שקיבלת.</p>`})()}</div></div>`;
   return h;
 }
 function vCourse(){
@@ -318,6 +344,8 @@ document.addEventListener('click',e=>{
     put(nid('s'),{kind:'strat',title:t,how:$('#nh-'+d.mod).value.trim(),tag:$('#ng-'+d.mod).value,mod:d.mod,ts:Date.now()});toast('הדרך נוספה')}
   else if(a==='new'){if(!S.classes.length){toast('הוסף קודם כיתה במסך הבית');location.hash='#home';return}openSheet({tool:d.tool,cls:d.cls})}
   else if(a==='export'){exportData()}
+  else if(a==='syncnow'){syncNow(true)}
+  else if(a==='unlink'){if(b.dataset.armed){setCfg(null);render();toast('הגיבוי האוטומטי נותק')}else{b.dataset.armed=1;b.textContent='בטוח? לחץ שוב'}}
   else if(a==='close'){$('#sheet').classList.remove('open')}
   else if(a==='res'||a==='lvl'||a==='rep'){keepForm();F[a]=a==='lvl'?+d.v:d.v;drawSheet()}
   else if(a==='save'){keepForm();
@@ -327,8 +355,11 @@ document.addEventListener('click',e=>{
 });
 $('#sheet').addEventListener('click',e=>{if(e.target.id==='sheet')$('#sheet').classList.remove('open')});
 
+readConnect();
 derive();
 route();
+if(lsGet(KEY+'-dirty'))setTimeout(syncNow,1500);
+window.addEventListener('online',()=>{if(lsGet(KEY+'-dirty'))syncNow()});
 document.addEventListener('change',e=>{if(e.target.id==='imp'&&e.target.files[0])importData(e.target.files[0])});
 if('serviceWorker' in navigator)window.addEventListener('load',()=>navigator.serviceWorker.register('sw.js').catch(()=>{}));
 
